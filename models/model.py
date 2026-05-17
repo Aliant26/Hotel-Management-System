@@ -246,3 +246,55 @@ class Model:
         data = cursor.fetchall()
         conn.close()
         return data
+
+    def update_guest(
+            self,
+            guest_id,
+            name,
+            phone,
+            email,
+            id_type,
+            id_number,
+            hotel_id
+    ):
+
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            UPDATE guests
+            SET name      = ?,
+                phone     = ?,
+                email     = ?,
+                id_type   = ?,
+                id_number = ?,
+                hotel_id  = ?
+            WHERE id = ?
+            """,
+            (
+                name,
+                phone,
+                email,
+                id_type,
+                id_number,
+                hotel_id,
+                guest_id
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+    def delete_guest(self, guest_id):
+
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "DELETE FROM guests WHERE id = ?",
+            (guest_id,)
+        )
+
+        conn.commit()
+        conn.close()

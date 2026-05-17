@@ -221,19 +221,22 @@ class Window(CTk):
 
         self.employee_tree.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.employee_button_frame = CTkFrame(self.tab_employees,fg_color="transparent")
+        self.employee_button_frame = CTkFrame(self.tab_employees, fg_color="transparent")
         self.employee_button_frame.pack(pady=10)
 
         self.add_employee_button = CTkButton(self.employee_button_frame, text="Dodaj pracownika", corner_radius=30,
-                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.add_employee_ui)
+                                             fg_color="#C850C0", hover_color="#4158D0",
+                                             command=self.controller.add_employee_ui)
         self.add_employee_button.pack(side="left", padx=5)
 
         self.edit_employee_button = CTkButton(self.employee_button_frame, text="Aktualizuj dane", corner_radius=30,
-                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.edit_employee_ui)
+                                              fg_color="#C850C0", hover_color="#4158D0",
+                                              command=self.controller.edit_employee_ui)
         self.edit_employee_button.pack(side="left", padx=5)
 
         self.delete_employee_button = CTkButton(self.employee_button_frame, text="Usuń pracownika", corner_radius=30,
-                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.delete_employee_ui)
+                                                fg_color="#C850C0", hover_color="#4158D0",
+                                                command=self.controller.delete_employee_ui)
         self.delete_employee_button.pack(side="left", padx=5)
 
         self.guest_frame = CTkFrame(self.tab_guests, corner_radius=15, fg_color="transparent")
@@ -286,12 +289,39 @@ class Window(CTk):
         self.guest_list_frame.pack(side="left", fill="both", expand=True)
 
         self.guest_tree = ttk.Treeview(
-            self.guest_list_frame
+            self.guest_list_frame,
+            columns=("id",)
         )
 
         self.guest_tree.heading("#0", text="Goście")
+        self.guest_tree.column("id", width=0, stretch=False)
 
         self.guest_tree.pack(fill="both", expand=True, padx=5, pady=5)
 
-        CTkButton(self.tab_guests, text="Dodaj gościa", corner_radius=30,
-                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.add_guest_ui).pack(pady=5)
+        self.guest_button_frame = CTkFrame(
+            self.tab_guests,
+            fg_color="transparent"
+        )
+
+        self.guest_button_frame.pack(pady=10)
+
+        self.add_guest_button = CTkButton(self.guest_button_frame, text="Dodaj gościa", corner_radius=30,
+                                          fg_color="#C850C0", hover_color="#4158D0",
+                                          command=self.controller.add_guest_ui
+                                          )
+
+        self.add_guest_button.pack(side="left", padx=5)
+
+        self.edit_guest_button = CTkButton(self.guest_button_frame, text="Aktualizuj dane", corner_radius=30,
+                                           fg_color="#C850C0", hover_color="#4158D0",
+                                           command=self.controller.edit_guest_ui
+                                           )
+
+        self.edit_guest_button.pack(side="left", padx=5)
+
+        self.delete_guest_button = CTkButton(self.guest_button_frame, text="Usuń gościa", corner_radius=30,
+                                             fg_color="#C850C0", hover_color="#4158D0",
+                                             command=self.controller.delete_guest_ui
+                                             )
+
+        self.delete_guest_button.pack(side="left", padx=5)

@@ -10,6 +10,7 @@ class Controller:
         self.view = view
         self.selected_hotel_id = None
         self.selected_employee_id = None
+        self.selected_guest_id = None
 
     def refresh_hotels(self):
 
@@ -338,6 +339,7 @@ class Controller:
         ]
 
     def add_guest_ui(self):
+
         name = self.view.guest_name_entry.get()
         phone = self.view.phone_entry.get()
         email = self.view.email_entry.get()
@@ -350,12 +352,46 @@ class Controller:
 
         hotel_id = int(hotel.split(" - ")[0])
 
-        self.model.add_guest(name, phone, email, id_type, id_number, hotel_id)
+        if self.selected_guest_id:
+
+            self.model.update_guest(
+                self.selected_guest_id,
+                name,
+                phone,
+                email,
+                id_type,
+                id_number,
+                hotel_id
+            )
+
+            self.selected_guest_id = None
+
+            self.view.guest_tree.selection_remove(
+                self.view.guest_tree.selection()
+            )
+
+            self.view.add_guest_button.configure(
+                text="Dodaj gościa"
+            )
+
+        else:
+
+            self.model.add_guest(
+                name,
+                phone,
+                email,
+                id_type,
+                id_number,
+                hotel_id
+            )
 
         self.view.guest_name_entry.delete(0, tk.END)
         self.view.phone_entry.delete(0, tk.END)
         self.view.email_entry.delete(0, tk.END)
         self.view.id_number_entry.delete(0, tk.END)
+
+        self.view.guest_hotel_var.set("")
+        self.view.id_type_combo.current(0)
 
         self.refresh_guests()
 
@@ -382,5 +418,79 @@ class Controller:
                 self.view.guest_tree.insert(
                     hotel_item,
                     tk.END,
-                    text=guest_name
+                    text=guest_name,
+                    values=(g[0],)
                 )
+
+    def edit_guest_ui(self):
+
+        selected = self.view.guest_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        values = self.view.guest_tree.item(item)["values"]
+
+        if not values:
+            return
+
+        guest_id = int(values[0])
+
+        guests = []
+
+        for h in self.model.get_hotels():
+            guests.extend(
+                self.model.get_guests_by_hotel(h[0])
+            )
+
+        guest = next(
+            g for g in guests if int(g[0]) == int(guest_id)
+        )
+
+        self.selected_guest_id = guest[0]
+
+        self.view.guest_name_entry.delete(0, tk.END)
+        self.view.phone_entry.delete(0, tk.END)
+        self.view.email_entry.delete(0, tk.END)
+        self.view.id_number_entry.delete(0, tk.END)
+
+        self.view.guest_name_entry.insert(0, guest[1])
+        self.view.phone_entry.insert(0, guest[2])
+        self.view.email_entry.insert(0, guest[3])
+
+        self.view.id_type_var.set(guest[4])
+
+        self.view.id_number_entry.insert(0, guest[5])
+
+        for h in self.model.get_hotels():
+
+            if h[0] == guest[6]:
+                self.view.guest_hotel_var.set(
+                    f"{h[0]} - {h[1]}"
+                )
+
+        self.view.add_guest_button.configure(
+            text="Zapisz zmiany"
+        )
+
+    def delete_guest_ui(self):
+
+        selected = self.view.guest_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        values = self.view.guest_tree.item(item)["values"]
+
+        if not values:
+            return
+
+        guest_id = int(values[0])
+
+        self.model.delete_guest(guest_id)
+
+        self.refresh_guests()
