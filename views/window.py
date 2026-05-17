@@ -209,15 +209,32 @@ class Window(CTk):
         self.emp_list_frame.pack(side="left", fill="both", expand=True)
 
         self.employee_tree = ttk.Treeview(
-            self.emp_list_frame
+            self.emp_list_frame,
+            columns=("id", "position")
         )
 
-        self.employee_tree.heading("#0", text="Pracownicy")
+        self.employee_tree.heading("#0", text="Pracownik")
+        self.employee_tree.heading("position", text="Stanowisko")
+
+        self.employee_tree.column("id", width=0, stretch=False)
+        self.employee_tree.column("position", width=150)
 
         self.employee_tree.pack(fill="both", expand=True, padx=5, pady=5)
 
-        CTkButton(self.tab_employees, text="Dodaj pracownika", corner_radius=30,
-                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.add_employee_ui).pack(pady=5)
+        self.employee_button_frame = CTkFrame(self.tab_employees,fg_color="transparent")
+        self.employee_button_frame.pack(pady=10)
+
+        self.add_employee_button = CTkButton(self.employee_button_frame, text="Dodaj pracownika", corner_radius=30,
+                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.add_employee_ui)
+        self.add_employee_button.pack(side="left", padx=5)
+
+        self.edit_employee_button = CTkButton(self.employee_button_frame, text="Aktualizuj dane", corner_radius=30,
+                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.edit_employee_ui)
+        self.edit_employee_button.pack(side="left", padx=5)
+
+        self.delete_employee_button = CTkButton(self.employee_button_frame, text="Usuń pracownika", corner_radius=30,
+                  fg_color="#C850C0", hover_color="#4158D0", command=self.controller.delete_employee_ui)
+        self.delete_employee_button.pack(side="left", padx=5)
 
         self.guest_frame = CTkFrame(self.tab_guests, corner_radius=15, fg_color="transparent")
         self.guest_frame.pack(fill="both", expand=True, padx=10, pady=10)
