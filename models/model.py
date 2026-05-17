@@ -153,6 +153,62 @@ class Model:
         conn.commit()
         conn.close()
 
+    def update_employee(
+            self,
+            employee_id,
+            name,
+            position,
+            contract,
+            date,
+            hotel_id,
+            address
+    ):
+
+        lat, lon = self.geocode_address(address)
+
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            UPDATE employees
+            SET name     = ?,
+                position = ?,
+                contract = ?,
+                date     = ?,
+                hotel_id = ?,
+                lat      = ?,
+                lon      = ?
+            WHERE id = ?
+            """,
+            (
+                name,
+                position,
+                contract,
+                date,
+                hotel_id,
+                lat,
+                lon,
+                employee_id
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+    def delete_employee(self, employee_id):
+
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "DELETE FROM employees WHERE id = ?",
+            (employee_id,)
+        )
+
+        conn.commit()
+        conn.close()
+
     def get_employees_by_hotel(self, hotel_id):
         conn = self.connect()
         cursor = conn.cursor()
