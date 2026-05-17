@@ -9,6 +9,7 @@ class Controller:
         self.model = Model()
         self.view = view
         self.selected_hotel_id = None
+        self.selected_employee_id = None
 
     def refresh_hotels(self):
 
@@ -213,14 +214,33 @@ class Controller:
 
         hotel_id = int(hotel.split(" - ")[0])
 
-        self.model.add_employee(
-            name,
-            position,
-            contract,
-            date,
-            hotel_id,
-            address
-        )
+        if self.selected_employee_id:
+
+            self.model.update_employee(
+                self.selected_employee_id,
+                name,
+                position,
+                contract,
+                date,
+                hotel_id,
+                address
+            )
+
+            self.selected_employee_id = None
+            self.view.add_employee_button.configure(
+                text="Dodaj pracownika"
+            )
+
+        else:
+
+            self.model.add_employee(
+                name,
+                position,
+                contract,
+                date,
+                hotel_id,
+                address
+            )
 
         self.view.employee_name_entry.delete(0, tk.END)
         self.view.employee_position_entry.delete(0, tk.END)
@@ -254,8 +274,63 @@ class Controller:
                 self.view.employee_tree.insert(
                     hotel_item,
                     tk.END,
-                    text=f"{employee_name} | {position}"
+                    text=employee_name,
+                    values=(e[0], position)
                 )
+
+    def edit_employee_ui(self):
+
+        selected = self.view.employee_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        employee_id = self.view.employee_tree.item(item)["values"][0]
+
+        employees = []
+
+        for h in self.model.get_hotels():
+            employees.extend(
+                self.model.get_employees_by_hotel(h[0])
+            )
+
+        employee = next(
+            e for e in employees if e[0] == employee_id
+        )
+
+        self.selected_employee_id = employee[0]
+
+        self.view.employee_name_entry.delete(0, tk.END)
+        self.view.employee_position_entry.delete(0, tk.END)
+        self.view.employee_contract_entry.delete(0, tk.END)
+        self.view.employee_date_entry.delete(0, tk.END)
+        self.view.employee_address_entry.delete(0, tk.END)
+
+        self.view.employee_name_entry.insert(0, employee[1])
+        self.view.employee_position_entry.insert(0, employee[2])
+        self.view.employee_contract_entry.insert(0, employee[3])
+        self.view.employee_date_entry.insert(0, employee[4])
+
+        self.view.add_employee_button.configure(
+            text="Zapisz zmiany"
+        )
+
+    def delete_employee_ui(self):
+
+        selected = self.view.employee_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        employee_id = self.view.employee_tree.item(item)["values"][0]
+
+        self.model.delete_employee(employee_id)
+
+        self.refresh_employees()
 
     def load_hotels_guests(self):
         self.view.guest_hotel_combo["values"] = [
