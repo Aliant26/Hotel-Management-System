@@ -1,4 +1,7 @@
-from views.window import Window
+from views.login import LoginApp
+from models.users import init_users_db
 
-app = Window()
+init_users_db()
+
+app = LoginApp()
 app.mainloop()
