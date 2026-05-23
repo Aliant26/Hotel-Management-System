@@ -50,6 +50,8 @@ class Window(CTk):
         self.form_frame = CTkFrame(self.hotel_frame, corner_radius=15)
         self.form_frame.grid(row=0, column=0, sticky="ns", padx=10, pady=10)
 
+        CTkLabel( self.form_frame,text="Formularz:").pack(anchor="w", padx=10, pady=5)
+
         CTkLabel(self.form_frame, text="Nazwa hotelu").pack(anchor="w", pady=(10, 2))
         self.name_entry = CTkEntry(self.form_frame, width=250)
         self.name_entry.pack(pady=10)
@@ -84,7 +86,6 @@ class Window(CTk):
 
         self.filter_data["values"] = [
             "Nazwa",
-            "Adres",
             "Miasto",
             "Wolne pokoje"
         ]
@@ -136,7 +137,7 @@ class Window(CTk):
         self.map_frame.grid_rowconfigure(1, weight=1)
         self.map_frame.grid_columnconfigure(0, weight=1)
 
-        self.map_label = CTkLabel(self.map_frame, text="Mapa")
+        self.map_label = CTkLabel(self.map_frame, text="Mapa hoteli")
 
         self.map_view = TkinterMapView(
             self.map_frame,
@@ -174,27 +175,29 @@ class Window(CTk):
         self.left_emp_frame = CTkFrame(self.employee_frame, corner_radius=15, fg_color="transparent")
         self.left_emp_frame.pack(side="left", fill="y", padx=10)
 
-        CTkLabel(self.left_emp_frame, text="Imię i nazwisko").grid(row=0, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame,text="Formularz:").grid(row=0, column=0, columnspan=2, sticky="w", pady=(5, 15))
+
+        CTkLabel(self.left_emp_frame, text="Imię i nazwisko").grid(row=1, column=0, padx=5, pady=5)
         self.employee_name_entry = CTkEntry(self.left_emp_frame, width=200)
-        self.employee_name_entry.grid(row=0, column=1)
+        self.employee_name_entry.grid(row=1, column=1)
 
-        CTkLabel(self.left_emp_frame, text="Adres").grid(row=1, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame, text="Adres").grid(row=2, column=0, padx=5, pady=5)
         self.employee_address_entry = CTkEntry(self.left_emp_frame, width=200)
-        self.employee_address_entry.grid(row=1, column=1)
+        self.employee_address_entry.grid(row=2, column=1)
 
-        CTkLabel(self.left_emp_frame, text="Stanowisko").grid(row=3, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame, text="Stanowisko").grid(row=4, column=0, padx=5, pady=5)
         self.employee_position_entry = CTkEntry(self.left_emp_frame, width=200)
-        self.employee_position_entry.grid(row=3, column=1)
+        self.employee_position_entry.grid(row=4, column=1)
 
-        CTkLabel(self.left_emp_frame, text="Rodzaj umowy").grid(row=4, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame, text="Rodzaj umowy").grid(row=5, column=0, padx=5, pady=5)
         self.employee_contract_entry = CTkEntry(self.left_emp_frame, width=200)
-        self.employee_contract_entry.grid(row=4, column=1)
+        self.employee_contract_entry.grid(row=5, column=1)
 
-        CTkLabel(self.left_emp_frame, text="Data zakończenia umowy").grid(row=5, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame, text="Data zakończenia umowy").grid(row=6, column=0, padx=5, pady=5)
         self.employee_date_entry = CTkEntry(self.left_emp_frame, width=200)
-        self.employee_date_entry.grid(row=5, column=1)
+        self.employee_date_entry.grid(row=6, column=1)
 
-        CTkLabel(self.left_emp_frame, text="Hotel").grid(row=2, column=0, padx=5, pady=5)
+        CTkLabel(self.left_emp_frame, text="Hotel").grid(row=3, column=0, padx=5, pady=5)
         self.employee_hotel_var = tk.StringVar()
 
         self.employee_hotel_combo = ttk.Combobox(
@@ -203,10 +206,56 @@ class Window(CTk):
             state="readonly",
             width=35
         )
-        self.employee_hotel_combo.grid(row=2, column=1)
+        self.employee_hotel_combo.grid(row=3, column=1)
 
         self.emp_list_frame = CTkFrame(self.employee_frame, corner_radius=15, fg_color="transparent")
         self.emp_list_frame.pack(side="left", fill="both", expand=True)
+
+        CTkLabel(self.emp_list_frame, text="Lista pracowników").pack(anchor="w", padx=10, pady=5)
+
+        self.emp_map_frame = CTkFrame(
+            self.employee_frame,
+            corner_radius=15,
+            fg_color="transparent"
+        )
+
+        self.emp_map_frame.pack(
+            side="left",
+            fill="both",
+            expand=True,
+            padx=10
+        )
+
+        self.employee_map_label = CTkLabel(
+            self.emp_map_frame,
+            text="Mapa pracowników"
+        )
+
+        self.employee_map_label.pack(
+            anchor="w",
+            padx=10,
+            pady=5
+        )
+
+        self.employee_map = TkinterMapView(
+            self.emp_map_frame,
+            width=300,
+            height=450
+        )
+
+        self.employee_map.pack(
+            fill="both",
+            expand=True,
+            padx=10,
+            pady=10
+        )
+
+        self.employee_map.set_tile_server(
+            "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        )
+
+        self.employee_map.set_position(52.2297, 21.0122)
+        self.employee_map.set_zoom(6)
 
         self.employee_tree = ttk.Treeview(
             self.emp_list_frame,
@@ -245,19 +294,21 @@ class Window(CTk):
         self.left_guest_frame = CTkFrame(self.guest_frame, corner_radius=15, fg_color="transparent")
         self.left_guest_frame.pack(side="left", fill="y", padx=10)
 
-        CTkLabel(self.left_guest_frame, text="Imię i nazwisko").grid(row=0, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Formularz:").grid(row=0, column=0, columnspan=2, sticky="w", pady=(5, 15))
+
+        CTkLabel(self.left_guest_frame, text="Imię i nazwisko").grid(row=1, column=0, padx=5, pady=5)
         self.guest_name_entry = CTkEntry(self.left_guest_frame, width=200)
-        self.guest_name_entry.grid(row=0, column=1)
+        self.guest_name_entry.grid(row=1, column=1)
 
-        CTkLabel(self.left_guest_frame, text="Telefon").grid(row=1, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Telefon").grid(row=2, column=0, padx=5, pady=5)
         self.phone_entry = CTkEntry(self.left_guest_frame, width=200)
-        self.phone_entry.grid(row=1, column=1)
+        self.phone_entry.grid(row=2, column=1)
 
-        CTkLabel(self.left_guest_frame, text="Email").grid(row=2, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Email").grid(row=3, column=0, padx=5, pady=5)
         self.email_entry = CTkEntry(self.left_guest_frame, width=200)
-        self.email_entry.grid(row=2, column=1)
+        self.email_entry.grid(row=3, column=1)
 
-        CTkLabel(self.left_guest_frame, text="Typ ID").grid(row=3, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Typ ID").grid(row=4, column=0, padx=5, pady=5)
         self.id_type_var = tk.StringVar()
 
         self.id_type_combo = ttk.Combobox(
@@ -266,15 +317,15 @@ class Window(CTk):
             state="readonly",
             width=25
         )
-        self.id_type_combo["values"] = ["Dowód", "Paszport", "Prawo jazdy"]
+        self.id_type_combo["values"] = ["Dowód", "Paszport", "Prawo jazdy", "Legitymacja"]
         self.id_type_combo.current(0)
-        self.id_type_combo.grid(row=3, column=1)
+        self.id_type_combo.grid(row=4, column=1)
 
-        CTkLabel(self.left_guest_frame, text="Numer ID").grid(row=4, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Numer ID").grid(row=5, column=0, padx=5, pady=5)
         self.id_number_entry = CTkEntry(self.left_guest_frame, width=200)
-        self.id_number_entry.grid(row=4, column=1)
+        self.id_number_entry.grid(row=5, column=1)
 
-        CTkLabel(self.left_guest_frame, text="Hotel").grid(row=5, column=0, padx=5, pady=5)
+        CTkLabel(self.left_guest_frame, text="Hotel").grid(row=6, column=0, padx=5, pady=5)
         self.guest_hotel_var = tk.StringVar()
 
         self.guest_hotel_combo = ttk.Combobox(
@@ -283,10 +334,56 @@ class Window(CTk):
             state="readonly",
             width=25
         )
-        self.guest_hotel_combo.grid(row=5, column=1)
+        self.guest_hotel_combo.grid(row=6, column=1)
 
         self.guest_list_frame = CTkFrame(self.guest_frame)
         self.guest_list_frame.pack(side="left", fill="both", expand=True)
+
+        CTkLabel(self.guest_list_frame, text="Lista gości").pack(anchor="w", padx=10, pady=5)
+
+        self.guest_map_frame = CTkFrame(
+            self.guest_frame,
+            corner_radius=15,
+            fg_color="transparent"
+        )
+
+        self.guest_map_frame.pack(
+            side="left",
+            fill="both",
+            expand=True,
+            padx=10
+        )
+
+        self.guest_map_label = CTkLabel(
+            self.guest_map_frame,
+            text="Mapa gości"
+        )
+
+        self.guest_map_label.pack(
+            anchor="w",
+            padx=10,
+            pady=5
+        )
+
+        self.guest_map = TkinterMapView(
+            self.guest_map_frame,
+            width=300,
+            height = 450
+        )
+
+        self.guest_map.pack(
+            fill="both",
+            expand=True,
+            padx=10,
+            pady=10
+        )
+
+        self.guest_map.set_tile_server(
+            "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        )
+
+        self.guest_map.set_position(52.2297, 21.0122)
+        self.guest_map.set_zoom(6)
 
         self.guest_tree = ttk.Treeview(
             self.guest_list_frame,
