@@ -26,21 +26,22 @@ class Controller:
 
         for h in hotels:
 
-            hotel_id = h[0]
-            hotel_name = h[1] or ""
+            hotel_id = h.id
+            hotel_name = h.name or ""
 
-            full_address = h[2] or ""
+            full_address = h.address or ""
 
-            rooms_total = h[3] or 0
-            rooms_free = h[4] or 0
+            rooms_total = h.rooms_total or 0
+            rooms_free = h.rooms_free or 0
 
-            lat = h[5]
-            lon = h[6]
+            lat = h.lat
+            lon = h.lon
 
             name_lower = hotel_name.lower()
             address_lower = full_address.lower()
 
             try:
+
                 street, city = full_address.split(",")
 
                 street = street.strip()
@@ -86,7 +87,7 @@ class Controller:
                 )
 
                 if lat is not None and lon is not None:
-                    self.view.map_view.set_marker(
+                    h.marker = self.view.map_view.set_marker(
                         lat,
                         lon,
                         text=hotel_name,
@@ -161,7 +162,7 @@ class Controller:
 
         hotel = self.model.get_hotels()[index]
 
-        self.selected_hotel_id = hotel[0]
+        self.selected_hotel_id = hotel.id
 
         self.view.name_entry.delete(0, tk.END)
         self.view.address_entry.delete(0, tk.END)
@@ -169,11 +170,11 @@ class Controller:
         self.view.rooms_total_entry.delete(0, tk.END)
         self.view.rooms_free_entry.delete(0, tk.END)
 
-        self.view.name_entry.insert(0, hotel[1])
-        self.view.address_entry.insert(0, hotel[2])
+        self.view.name_entry.insert(0, hotel.name)
+        self.view.address_entry.insert(0, hotel.address)
 
-        self.view.rooms_total_entry.insert(0, hotel[3])
-        self.view.rooms_free_entry.insert(0, hotel[4])
+        self.view.rooms_total_entry.insert(0, hotel.rooms_total)
+        self.view.rooms_free_entry.insert(0, hotel.rooms_free)
 
         self.view.save_button.configure(
             text="Zapisz zmiany"
@@ -192,13 +193,13 @@ class Controller:
 
         hotel = self.model.get_hotels()[index]
 
-        self.model.delete_hotel(hotel[0])
+        self.model.delete_hotel(hotel.id)
 
         self.refresh_hotels()
 
     def load_hotels_to_employee_combo(self):
         self.view.employee_hotel_combo["values"] = [
-            f"{h[0]} - {h[1]}" for h in self.model.get_hotels()
+            f"{h.id} - {h.name}" for h in self.model.get_hotels()
         ]
 
     def add_employee_ui(self):
@@ -255,10 +256,11 @@ class Controller:
 
         for item in self.view.employee_tree.get_children():
             self.view.employee_tree.delete(item)
+            self.view.employee_map.delete_all_marker()
 
         for h in self.model.get_hotels():
 
-            hotel_name = h[1]
+            hotel_name = h.name
 
             hotel_item = self.view.employee_tree.insert(
                 "",
@@ -266,18 +268,27 @@ class Controller:
                 text=hotel_name
             )
 
-            employees = self.model.get_employees_by_hotel(h[0])
+            employees = self.model.get_employees_by_hotel(h.id)
 
             for e in employees:
-                employee_name = e[1]
-                position = e[2]
+                employee_name = e.name
+                position = e.position
 
                 self.view.employee_tree.insert(
                     hotel_item,
                     tk.END,
                     text=employee_name,
-                    values=(e[0], position)
+                    values=(e.id, position)
                 )
+
+                if e.lat is not None and e.lon is not None:
+                    e.marker = self.view.employee_map.set_marker(
+                        e.lat,
+                        e.lon,
+                        text=f"{employee_name}\n{position}",
+                        marker_color_circle="pink",
+                        marker_color_outside="#FF00FF"
+                    )
 
     def edit_employee_ui(self):
 
@@ -294,14 +305,14 @@ class Controller:
 
         for h in self.model.get_hotels():
             employees.extend(
-                self.model.get_employees_by_hotel(h[0])
+                self.model.get_employees_by_hotel(h.id)
             )
 
         employee = next(
-            e for e in employees if e[0] == employee_id
+            e for e in employees if e.id == employee_id
         )
 
-        self.selected_employee_id = employee[0]
+        self.selected_employee_id = employee.id
 
         self.view.employee_name_entry.delete(0, tk.END)
         self.view.employee_position_entry.delete(0, tk.END)
@@ -309,10 +320,10 @@ class Controller:
         self.view.employee_date_entry.delete(0, tk.END)
         self.view.employee_address_entry.delete(0, tk.END)
 
-        self.view.employee_name_entry.insert(0, employee[1])
-        self.view.employee_position_entry.insert(0, employee[2])
-        self.view.employee_contract_entry.insert(0, employee[3])
-        self.view.employee_date_entry.insert(0, employee[4])
+        self.view.employee_name_entry.insert(0, employee.name)
+        self.view.employee_position_entry.insert(0, employee.position)
+        self.view.employee_contract_entry.insert(0, employee.contract)
+        self.view.employee_date_entry.insert(0, employee.date)
 
         self.view.add_employee_button.configure(
             text="Zapisz zmiany"
@@ -335,7 +346,7 @@ class Controller:
 
     def load_hotels_guests(self):
         self.view.guest_hotel_combo["values"] = [
-            f"{h[0]} - {h[1]}" for h in self.model.get_hotels()
+            f"{h.id} - {h.name}" for h in self.model.get_hotels()
         ]
 
     def add_guest_ui(self):
@@ -399,10 +410,11 @@ class Controller:
 
         for item in self.view.guest_tree.get_children():
             self.view.guest_tree.delete(item)
+            self.view.guest_map.delete_all_marker()
 
         for h in self.model.get_hotels():
 
-            hotel_name = h[1]
+            hotel_name = h.name
 
             hotel_item = self.view.guest_tree.insert(
                 "",
@@ -410,17 +422,26 @@ class Controller:
                 text=hotel_name
             )
 
-            guests = self.model.get_guests_by_hotel(h[0])
+            guests = self.model.get_guests_by_hotel(h.id)
 
             for g in guests:
-                guest_name = g[1]
+                guest_name = g.name
 
                 self.view.guest_tree.insert(
                     hotel_item,
                     tk.END,
                     text=guest_name,
-                    values=(g[0],)
+                    values=(g.id,)
                 )
+
+                if g.lat is not None and g.lon is not None:
+                    g.marker = self.view.guest_map.set_marker(
+                        g.lat,
+                        g.lon,
+                        text=f"{guest_name}\n{hotel_name}",
+                        marker_color_circle="pink",
+                        marker_color_outside="#FF00FF"
+                    )
 
     def edit_guest_ui(self):
 
@@ -442,33 +463,31 @@ class Controller:
 
         for h in self.model.get_hotels():
             guests.extend(
-                self.model.get_guests_by_hotel(h[0])
+                self.model.get_guests_by_hotel(h.id)
             )
 
         guest = next(
-            g for g in guests if int(g[0]) == int(guest_id)
+            g for g in guests if int(g.id) == int(guest_id)
         )
 
-        self.selected_guest_id = guest[0]
+        self.selected_guest_id = guest.id
 
         self.view.guest_name_entry.delete(0, tk.END)
         self.view.phone_entry.delete(0, tk.END)
         self.view.email_entry.delete(0, tk.END)
         self.view.id_number_entry.delete(0, tk.END)
 
-        self.view.guest_name_entry.insert(0, guest[1])
-        self.view.phone_entry.insert(0, guest[2])
-        self.view.email_entry.insert(0, guest[3])
-
-        self.view.id_type_var.set(guest[4])
-
-        self.view.id_number_entry.insert(0, guest[5])
+        self.view.guest_name_entry.insert(0, guest.name)
+        self.view.phone_entry.insert(0, guest.phone)
+        self.view.email_entry.insert(0, guest.email)
+        self.view.id_type_var.set(guest.id_type)
+        self.view.id_number_entry.insert(0, guest.id_number)
 
         for h in self.model.get_hotels():
 
-            if h[0] == guest[6]:
+            if h.id == guest.hotel_id:
                 self.view.guest_hotel_var.set(
-                    f"{h[0]} - {h[1]}"
+                    f"{h.id} - {h.name}"
                 )
 
         self.view.add_guest_button.configure(
