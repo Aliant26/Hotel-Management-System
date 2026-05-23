@@ -50,7 +50,7 @@ class Window(CTk):
         self.form_frame = CTkFrame(self.hotel_frame, corner_radius=15)
         self.form_frame.grid(row=0, column=0, sticky="ns", padx=10, pady=10)
 
-        CTkLabel( self.form_frame,text="Formularz:").pack(anchor="w", padx=10, pady=5)
+        CTkLabel(self.form_frame, text="Formularz:", font=("Arial", 14, "bold")).pack(anchor="w", padx=10, pady=5)
 
         CTkLabel(self.form_frame, text="Nazwa hotelu").pack(anchor="w", pady=(10, 2))
         self.name_entry = CTkEntry(self.form_frame, width=250)
@@ -71,7 +71,7 @@ class Window(CTk):
         self.list_frame = CTkFrame(self.hotel_frame, corner_radius=15, fg_color="transparent")
         self.list_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
-        CTkLabel(self.list_frame, text="Lista hoteli").pack(anchor="w", padx=10, pady=5)
+        CTkLabel(self.list_frame, text="Lista hoteli", font=("Arial", 14, "bold")).pack(anchor="w", padx=10, pady=5)
 
         self.filter_frame = CTkFrame(self.list_frame, fg_color="transparent")
         self.filter_frame.pack(fill="x", padx=10, pady=5)
@@ -137,7 +137,7 @@ class Window(CTk):
         self.map_frame.grid_rowconfigure(1, weight=1)
         self.map_frame.grid_columnconfigure(0, weight=1)
 
-        self.map_label = CTkLabel(self.map_frame, text="Mapa hoteli")
+        self.map_label = CTkLabel(self.map_frame, text="Mapa hoteli", font=("Arial", 14, "bold"))
 
         self.map_view = TkinterMapView(
             self.map_frame,
@@ -175,7 +175,8 @@ class Window(CTk):
         self.left_emp_frame = CTkFrame(self.employee_frame, corner_radius=15, fg_color="transparent")
         self.left_emp_frame.pack(side="left", fill="y", padx=10)
 
-        CTkLabel(self.left_emp_frame,text="Formularz:").grid(row=0, column=0, columnspan=2, sticky="w", pady=(5, 15))
+        CTkLabel(self.left_emp_frame, text="Formularz:", font=("Arial", 14, "bold")).grid(row=0, column=0, columnspan=2,
+                                                                                          sticky="w", pady=(5, 15))
 
         CTkLabel(self.left_emp_frame, text="Imię i nazwisko").grid(row=1, column=0, padx=5, pady=5)
         self.employee_name_entry = CTkEntry(self.left_emp_frame, width=200)
@@ -208,10 +209,69 @@ class Window(CTk):
         )
         self.employee_hotel_combo.grid(row=3, column=1)
 
+        self.employee_details_frame = CTkFrame(
+            self.left_emp_frame,
+            corner_radius=10
+        )
+
+        self.employee_details_frame.grid(
+            row=7,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=(20, 10)
+        )
+
+        CTkLabel(
+            self.employee_details_frame,
+            text="Szczegóły pracownika",
+            font=("Arial", 14, "bold")
+        ).pack(anchor="w", padx=10, pady=5)
+
+        self.employee_details_name = CTkLabel(
+            self.employee_details_frame,
+            text="Imię i nazwisko: ..."
+        )
+
+        self.employee_details_name.pack(anchor="w", padx=10)
+
+        self.employee_details_position = CTkLabel(
+            self.employee_details_frame,
+            text="Stanowisko: ..."
+        )
+
+        self.employee_details_position.pack(anchor="w", padx=10)
+
+        self.employee_details_contract = CTkLabel(
+            self.employee_details_frame,
+            text="Umowa: ..."
+        )
+
+        self.employee_details_contract.pack(anchor="w", padx=10)
+
+        self.employee_details_date = CTkLabel(
+            self.employee_details_frame,
+            text="Data zakończenia: ..."
+        )
+
+        self.employee_details_date.pack(anchor="w", padx=10)
+
+        self.employee_details_hotel = CTkLabel(
+            self.employee_details_frame,
+            text="Hotel: ..."
+        )
+
+        self.employee_details_hotel.pack(
+            anchor="w",
+            padx=10,
+            pady=(0, 10)
+        )
+
         self.emp_list_frame = CTkFrame(self.employee_frame, corner_radius=15, fg_color="transparent")
         self.emp_list_frame.pack(side="left", fill="both", expand=True)
 
-        CTkLabel(self.emp_list_frame, text="Lista pracowników").pack(anchor="w", padx=10, pady=5)
+        CTkLabel(self.emp_list_frame, text="Lista pracowników", font=("Arial", 14, "bold")).pack(anchor="w", padx=10,
+                                                                                                 pady=5)
 
         self.emp_map_frame = CTkFrame(
             self.employee_frame,
@@ -228,7 +288,8 @@ class Window(CTk):
 
         self.employee_map_label = CTkLabel(
             self.emp_map_frame,
-            text="Mapa pracowników"
+            text="Mapa pracowników",
+            font=("Arial", 14, "bold")
         )
 
         self.employee_map_label.pack(
@@ -270,6 +331,8 @@ class Window(CTk):
 
         self.employee_tree.pack(fill="both", expand=True, padx=5, pady=5)
 
+        self.employee_tree.bind("<<TreeviewSelect>>", lambda event: self.controller.show_employee_details())
+
         self.employee_button_frame = CTkFrame(self.tab_employees, fg_color="transparent")
         self.employee_button_frame.pack(pady=10)
 
@@ -294,7 +357,9 @@ class Window(CTk):
         self.left_guest_frame = CTkFrame(self.guest_frame, corner_radius=15, fg_color="transparent")
         self.left_guest_frame.pack(side="left", fill="y", padx=10)
 
-        CTkLabel(self.left_guest_frame, text="Formularz:").grid(row=0, column=0, columnspan=2, sticky="w", pady=(5, 15))
+        CTkLabel(self.left_guest_frame, text="Formularz:", font=("Arial", 14, "bold")).grid(row=0, column=0,
+                                                                                            columnspan=2, sticky="w",
+                                                                                            pady=(5, 15))
 
         CTkLabel(self.left_guest_frame, text="Imię i nazwisko").grid(row=1, column=0, padx=5, pady=5)
         self.guest_name_entry = CTkEntry(self.left_guest_frame, width=200)
@@ -336,10 +401,62 @@ class Window(CTk):
         )
         self.guest_hotel_combo.grid(row=6, column=1)
 
+        self.guest_details_frame = CTkFrame(
+            self.left_guest_frame,
+            corner_radius=10
+        )
+
+        self.guest_details_frame.grid(
+            row=7,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=(20, 10)
+        )
+
+        CTkLabel(
+            self.guest_details_frame,
+            text="Szczegóły gościa",
+            font=("Arial", 14, "bold")
+        ).pack(anchor="w", padx=10, pady=5)
+
+        self.guest_details_name = CTkLabel(
+            self.guest_details_frame,
+            text="Imię i nazwisko: ..."
+        )
+
+        self.guest_details_name.pack(anchor="w", padx=10)
+
+        self.guest_details_phone = CTkLabel(
+            self.guest_details_frame,
+            text="Telefon: ..."
+        )
+
+        self.guest_details_phone.pack(anchor="w", padx=10)
+
+        self.guest_details_email = CTkLabel(
+            self.guest_details_frame,
+            text="Email: ..."
+        )
+
+        self.guest_details_email.pack(anchor="w", padx=10)
+
+        self.guest_details_hotel = CTkLabel(
+            self.guest_details_frame,
+            text="Hotel: ..."
+        )
+
+        self.guest_details_hotel.pack(
+            anchor="w",
+            padx=10,
+            pady=(0, 10)
+        )
+
         self.guest_list_frame = CTkFrame(self.guest_frame)
         self.guest_list_frame.pack(side="left", fill="both", expand=True)
 
-        CTkLabel(self.guest_list_frame, text="Lista gości").pack(anchor="w", padx=10, pady=5)
+        CTkLabel(self.guest_list_frame, text="Lista gości", font=("Arial", 14, "bold")).pack(anchor="w", padx=10,
+                                                                                             pady=5)
 
         self.guest_map_frame = CTkFrame(
             self.guest_frame,
@@ -356,7 +473,8 @@ class Window(CTk):
 
         self.guest_map_label = CTkLabel(
             self.guest_map_frame,
-            text="Mapa gości"
+            text="Mapa gości",
+            font=("Arial", 14, "bold")
         )
 
         self.guest_map_label.pack(
@@ -368,7 +486,7 @@ class Window(CTk):
         self.guest_map = TkinterMapView(
             self.guest_map_frame,
             width=300,
-            height = 450
+            height=450
         )
 
         self.guest_map.pack(
@@ -394,6 +512,8 @@ class Window(CTk):
         self.guest_tree.column("id", width=0, stretch=False)
 
         self.guest_tree.pack(fill="both", expand=True, padx=5, pady=5)
+
+        self.guest_tree.bind("<<TreeviewSelect>>", lambda event: self.controller.show_guest_details())
 
         self.guest_button_frame = CTkFrame(
             self.tab_guests,
