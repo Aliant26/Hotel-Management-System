@@ -1,6 +1,7 @@
 import tkinter as tk
+from tkinter import messagebox
+import re
 from models.model import Model
-
 
 class Controller:
     def __init__(self, view):
@@ -11,6 +12,18 @@ class Controller:
         self.selected_hotel_id = None
         self.selected_employee_id = None
         self.selected_guest_id = None
+
+    def validate_email(self, email):
+
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        return re.match(pattern, email)
+
+    def validate_phone(self, phone):
+
+        pattern = r"^(\+48)?\s?\d{3}[\s-]?\d{3}[\s-]?\d{3}$"
+
+        return re.match(pattern, phone)
 
     def refresh_hotels(self):
 
@@ -329,6 +342,68 @@ class Controller:
             text="Zapisz zmiany"
         )
 
+    def show_employee_details(self):
+
+        selected = self.view.employee_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        values = self.view.employee_tree.item(item)["values"]
+
+        if not values:
+            return
+
+        employee_id = values[0]
+
+        employees = []
+
+        for h in self.model.get_hotels():
+            employees.extend(
+                self.model.get_employees_by_hotel(h.id)
+            )
+
+        employee = next(
+            e for e in employees if e.id == employee_id
+        )
+
+        self.view.employee_details_name.configure(
+            text=f"Imię i nazwisko: {employee.name}"
+        )
+
+        self.view.employee_details_position.configure(
+            text=f"Stanowisko: {employee.position}"
+        )
+
+        self.view.employee_details_contract.configure(
+            text=f"Umowa: {employee.contract}"
+        )
+
+        self.view.employee_details_date.configure(
+            text=f"Data zakończenia: {employee.date}"
+        )
+
+        hotel_name = "..."
+
+        for h in self.model.get_hotels():
+
+            if h.id == employee.hotel_id:
+                hotel_name = h.name
+
+        self.view.employee_details_hotel.configure(
+            text=f"Hotel: {hotel_name}"
+        )
+
+        if employee.lat and employee.lon:
+            self.view.employee_map.set_position(
+                employee.lat,
+                employee.lon
+            )
+
+            self.view.employee_map.set_zoom(12)
+
     def delete_employee_ui(self):
 
         selected = self.view.employee_tree.selection()
@@ -357,6 +432,22 @@ class Controller:
         id_type = self.view.id_type_var.get()
         id_number = self.view.id_number_entry.get()
         hotel = self.view.guest_hotel_var.get()
+
+        if email and not self.validate_email(email):
+            tk.messagebox.showerror(
+                "Błąd",
+                "Niepoprawny adres email"
+            )
+
+            return
+
+        if phone and not self.validate_phone(phone):
+            tk.messagebox.showerror(
+                "Błąd",
+                "Niepoprawny numer telefonu"
+            )
+
+            return
 
         if not name or not hotel:
             return
@@ -493,6 +584,64 @@ class Controller:
         self.view.add_guest_button.configure(
             text="Zapisz zmiany"
         )
+
+    def show_guest_details(self):
+
+        selected = self.view.guest_tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        values = self.view.guest_tree.item(item)["values"]
+
+        if not values:
+            return
+
+        guest_id = values[0]
+
+        guests = []
+
+        for h in self.model.get_hotels():
+            guests.extend(
+                self.model.get_guests_by_hotel(h.id)
+            )
+
+        guest = next(
+            g for g in guests if g.id == guest_id
+        )
+
+        self.view.guest_details_name.configure(
+            text=f"Imię i nazwisko: {guest.name}"
+        )
+
+        self.view.guest_details_phone.configure(
+            text=f"Telefon: {guest.phone}"
+        )
+
+        self.view.guest_details_email.configure(
+            text=f"Email: {guest.email}"
+        )
+
+        hotel_name = "..."
+
+        for h in self.model.get_hotels():
+
+            if h.id == guest.hotel_id:
+                hotel_name = h.name
+
+        self.view.guest_details_hotel.configure(
+            text=f"Hotel: {hotel_name}"
+        )
+
+        if guest.lat and guest.lon:
+            self.view.guest_map.set_position(
+                guest.lat,
+                guest.lon
+            )
+
+            self.view.guest_map.set_zoom(12)
 
     def delete_guest_ui(self):
 
