@@ -1,6 +1,84 @@
 import sqlite3
 from geopy.geocoders import Nominatim
 
+class Hotel:
+
+    def __init__(
+            self,
+            hotel_id,
+            name,
+            address,
+            rooms_total,
+            rooms_free,
+            lat,
+            lon
+    ):
+
+        self.id = hotel_id
+        self.name = name
+        self.address = address
+        self.rooms_total = rooms_total
+        self.rooms_free = rooms_free
+
+        self.lat = lat
+        self.lon = lon
+
+        self.marker = None
+
+
+class Employee:
+
+    def __init__(
+            self,
+            employee_id,
+            name,
+            position,
+            contract,
+            date,
+            hotel_id,
+            lat,
+            lon
+    ):
+
+        self.id = employee_id
+        self.name = name
+        self.position = position
+        self.contract = contract
+        self.date = date
+        self.hotel_id = hotel_id
+
+        self.lat = lat
+        self.lon = lon
+
+        self.marker = None
+
+
+class Guest:
+
+    def __init__(
+            self,
+            guest_id,
+            name,
+            phone,
+            email,
+            id_type,
+            id_number,
+            hotel_id,
+            lat,
+            lon
+    ):
+
+        self.id = guest_id
+        self.name = name
+        self.phone = phone
+        self.email = email
+        self.id_type = id_type
+        self.id_number = id_number
+        self.hotel_id = hotel_id
+        self.lat = lat
+        self.lon = lon
+
+        self.marker = None
 
 class Model:
 
@@ -29,9 +107,22 @@ class Model:
                     location.longitude
                 )
 
-        except ValueError:
-            return None, None
+            city = address.split(",")[-1].strip()
 
+            location = self.geotag.geocode(
+                city + ", Poland"
+            )
+
+            if location:
+                return (
+                    location.latitude,
+                    location.longitude
+                )
+
+        except Exception:
+            pass
+
+        return None, None
     def init_db(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -71,7 +162,9 @@ class Model:
                            email TEXT,
                            id_type TEXT,
                            id_number TEXT,
-                           hotel_id INTEGER
+                           hotel_id INTEGER,
+                           lat REAL,
+                           lon REAL
                        )
                        """)
 
@@ -104,8 +197,24 @@ class Model:
         cursor.execute("SELECT * FROM hotels")
         data = cursor.fetchall()
 
+        hotels = []
+
+        for row in data:
+            hotel = Hotel(
+                row[0],
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6]
+            )
+
+            hotels.append(hotel)
+
         conn.close()
-        return data
+
+        return hotels
 
     def update_hotel(self, hotel_id, name, address, rooms_total, rooms_free):
 
@@ -220,15 +329,47 @@ class Model:
 
         data = cursor.fetchall()
         conn.close()
-        return data
+        employees = []
+
+        for row in data:
+            employee = Employee(
+                row[0],
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6],
+                row[7]
+            )
+
+            employees.append(employee)
+
+        conn.close()
+
+        return employees
 
     def add_guest(self, name, phone, email, id_type, id_number, hotel_id):
         conn = self.connect()
         cursor = conn.cursor()
 
         cursor.execute(
-            "INSERT INTO guests (name, phone, email, id_type, id_number, hotel_id) VALUES (?, ?, ?, ?, ?, ?)",
-            (name, phone, email, id_type, id_number, hotel_id)
+            "SELECT lat, lon FROM hotels WHERE id = ?",
+            (hotel_id,)
+        )
+
+        hotel_coordinates = cursor.fetchone()
+
+        lat = None
+        lon = None
+
+        if hotel_coordinates:
+            lat = hotel_coordinates[0]
+            lon = hotel_coordinates[1]
+
+        cursor.execute(
+            "INSERT INTO guests (name, phone, email, id_type, id_number, hotel_id, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (name, phone, email, id_type, id_number, hotel_id, lat, lon)
         )
 
         conn.commit()
@@ -245,7 +386,26 @@ class Model:
 
         data = cursor.fetchall()
         conn.close()
-        return data
+        guests = []
+
+        for row in data:
+            guest = Guest(
+                row[0],
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6],
+                row[7],
+                row[8]
+            )
+
+            guests.append(guest)
+
+        conn.close()
+
+        return guests
 
     def update_guest(
             self,
